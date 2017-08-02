@@ -23,7 +23,8 @@
     "no-cond-assign": [0],
     "import/no-unresolved": [0],
     "no-underscore-dangle": [0],
-    "require-yield": [1]
+    "require-yield": [1],
+    "camelcase": [0]
   },
   "parserOptions": {
     "ecmaFeatures": {

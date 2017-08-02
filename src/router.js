@@ -15,7 +15,7 @@ const Routers = function ({ history, app }) {
       component: IndexPage,
       getIndexRoute(nextState, cb) {
         require.ensure([], (require) => {
-          registerModel(app, require('./models/loginInfo'));
+          registerModel(app, require('./models/list'));
           cb(null, { component: require('./routes/List') });
         }, 'IndexPageList');
       },

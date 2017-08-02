@@ -1,54 +1,79 @@
-import { routerRedux } from 'dva/router';
-import fetchLogin from '../services/login.js';
+// import { routerRedux } from 'dva/router';
+import fetchList from '../services/list';
 
+// 通过subscriptions 监听/路径。
+// 进入路由就会根据queryString.tab,来做判断
+// 如果tab为空或者all,则fetch 拉取全部的内容
+// 如果tab为其他，则根据相应的tab内容来拉取内容。
 export default {
 
-  namespace: 'loginInfo',
+  namespace: 'list',
 
   state: {
-    accesstoken: null,
-    information: null,
+    currentTab: 'all',
+    currentPage: 1,
+    listData: [[]],
   },
 
   subscriptions: {
     setup({ dispatch, history }) {  // eslint-disable-line
-      // 这里做访问权限控制
-      // history.listen....
-      // 1.搜索本地保存的accesstoken，有则显示登录状态的页面（个人中心）
-      // 2.跳转的地址是否为需要下权限的地址，personalCenter等，如果是，在没有权限的情况下
-      // 跳回IndexPage。
+      // 监听 "/"路径，然后获取queryString中的tab,
+      // 发出query动作，拉取信息。
+      history.listen((location) => {
+        const { pathname } = location;
+        if (pathname === '/') {
+          const { query } = location;
+          const { tab } = query;
+          const queryStringTab = tab === undefined && 'all' ? 'all' : tab;
+          dispatch({
+            type: 'initializeState',
+          });
+          dispatch({
+            type: 'query',
+            payload: {
+              tab: queryStringTab,
+            },
+          });
+        }
+      });
     },
   },
 
   effects: {
-    *logout({ payload }, { call, put }) {  // eslint-disable-line
-      yield put({ type: 'clearInformation' });
-    },
-    *login({ payload }, { call, put }) {
-      const { accesstoken } = payload;
-      const loginResult = yield call(fetchLogin, accesstoken);
-      if (loginResult.data) {
-        const loginInfo = loginResult.data;
-        yield put({ type: 'addInformation', loginInfo, accesstoken });
-        yield put(routerRedux.push('/'));
+    *query({ payload }, { call, put }) {  // eslint-disable-line
+      const { tab } = payload;
+      let { page, limit } = payload;
+      page = page === undefined ? 1 : page;
+      limit = limit === undefined ? 20 : limit;
+      const queryString = { tab, page, limit };
+      const requestResult = yield call(fetchList, queryString);
+      if (requestResult.data) {
+        const result = requestResult.data;
+        const { data } = result;
+        yield put({
+          type: 'getPageData',
+          data,
+          tab,
+        });
       } else {
-        throw (new Error('未通过验证'));
+        throw (new Error('获取数据失败'));
       }
     },
   },
 
   reducers: {
-    clearInformation(state) {
+    initializeState(state) {
       const newState = state;
-      newState.accesstoken = null;
-      newState.information = null;
+      newState.currentTab = 'all';
+      newState.currentPage = 1;
+      newState.listData = [];
       return { ...newState };
     },
-    addInformation(state, action) {
-      const { loginInfo, accesstoken } = action;
+    getPageData(state, action) {
+      const { data, tab } = action;
       const newState = state;
-      newState.information = loginInfo;
-      newState.accesstoken = accesstoken;
+      newState.currentTab = tab;
+      newState.listData = data;
       return { ...newState };
     },
   },

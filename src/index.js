@@ -9,7 +9,7 @@ import './rem.less';
 const app = dva({
   history: browserHistory,
   onError(e) {
-    Toast.info(`${e}`, 1);
+    Toast.info(`${e}`, 2);
   },
 });
 

@@ -1,4 +1,8 @@
 import React from 'react';
+import { WhiteSpace } from 'antd-mobile';
+import Nav from './nav.js';
+import ListItem from './ListItem';
+
 
 class List extends React.Component {
   constructor(props) {
@@ -8,8 +12,16 @@ class List extends React.Component {
     };
   }
   render() {
+    const { list } = this.props;
+    const { currentTab, listData } = list;
+    console.log(list);
     return (
-      <h1>这里是列表</h1>
+      <div>
+        <WhiteSpace />
+        <Nav currentTab={currentTab} />
+        <WhiteSpace />
+        <ListItem listData={listData} />
+      </div>
     );
   }
 }
