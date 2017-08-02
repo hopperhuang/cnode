@@ -1,0 +1,26 @@
+{
+  "entry": "src/index.js",
+  "disableCSSModules": false,
+  "proxy": {
+    "/api": {
+      "target": "https://cnodejs.org/api/v1",
+      "changeOrigin": true,
+      "pathRewrite": { "^/api" : "" }
+    }
+  },
+  "env": {
+    "development": {
+      "extraBabelPlugins": [
+        "dva-hmr",
+        "transform-runtime",
+        ["import", { "libraryName": "antd-mobile", "libraryDirectory": "lib", "style": "css" }]
+      ]
+    },
+    "production": {
+      "extraBabelPlugins": [
+        "transform-runtime",
+        ["import", { "libraryName": "antd-mobile", "libraryDirectory": "lib", "style": "css" }]
+      ]
+    }
+  }
+}
