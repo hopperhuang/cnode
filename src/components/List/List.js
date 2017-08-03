@@ -2,6 +2,7 @@ import React from 'react';
 import { WhiteSpace } from 'antd-mobile';
 import Nav from './nav.js';
 import ListItem from './ListItem';
+import styles from './List.less';
 
 
 class List extends React.Component {
@@ -14,13 +15,13 @@ class List extends React.Component {
   render() {
     const { list } = this.props;
     const { currentTab, listData } = list;
-    console.log(list);
+    const { dispatch } = this.props;
     return (
-      <div>
-        <WhiteSpace />
+      <div className={styles.list}>
+        <WhiteSpace size="sm" />
         <Nav currentTab={currentTab} />
-        <WhiteSpace />
-        <ListItem listData={listData} />
+        <WhiteSpace size="sm" />
+        <ListItem listData={listData} dispatch={dispatch} />
       </div>
     );
   }

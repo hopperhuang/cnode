@@ -40,6 +40,7 @@ export default {
   },
 
   effects: {
+    // 开始进入时触发的动作。
     *query({ payload }, { call, put }) {  // eslint-disable-line
       const { tab } = payload;
       let { page, limit } = payload;
@@ -59,21 +60,58 @@ export default {
         throw (new Error('获取数据失败'));
       }
     },
+    // 拉到底部，更新数据的时候触发的动作。
+    *fetchNewData({ payload }, { call, put, select }) {
+      const list = yield select(state => state.list);
+      console.log(list);
+      const { currentTab } = list;
+      let { currentPage } = list;
+      currentPage += 1;
+      const limit = 20;
+      const queryString = {
+        tab: currentTab,
+        page: currentPage,
+        limit,
+      };
+      const requestResult = yield call(fetchList, queryString);
+      if (requestResult.data) {
+        const result = requestResult.data;
+        const { data } = result;
+        yield put({
+          type: 'concatNewData',
+          data,
+          currentPage,
+        });
+      } else {
+        throw (new Error('获取数据失败'));
+      }
+    },
   },
 
   reducers: {
+    // 进入路由时，初始化状态的动作。
     initializeState(state) {
       const newState = state;
-      newState.currentTab = 'all';
+      newState.currentTab = 'laoding';
       newState.currentPage = 1;
       newState.listData = [];
       return { ...newState };
     },
+    // 首次获取data后改变state的动作
     getPageData(state, action) {
       const { data, tab } = action;
       const newState = state;
       newState.currentTab = tab;
       newState.listData = data;
+      return { ...newState };
+    },
+    // 下拉到尽头，获取新的data,改变state的多做，改变currentPage并concat数组。
+    concatNewData(state, action) {
+      const { data, currentPage } = action;
+      const newState = state;
+      newState.currentPage = currentPage;
+      const newListData = state.listData.concat(data);
+      newState.listData = newListData;
       return { ...newState };
     },
   },
