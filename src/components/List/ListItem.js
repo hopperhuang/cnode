@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListView, WingBlank } from 'antd-mobile';
+import { ListView, WingBlank, RefreshControl } from 'antd-mobile';
 import { Link } from 'dva/router';
 import styles from './ListItem.less';
 
@@ -8,10 +8,20 @@ class ListItem extends React.Component {
     super(props);
     this.renderRow = this.renderRow.bind(this);
     this.onEndReachedHandler = this.onEndReachedHandler.bind(this);
+    this.onRefreshHandler = this.onRefreshHandler.bind(this);
   }
   onEndReachedHandler() {
     const { dispatch } = this.props;
-    dispatch({ type: 'list/fetchNewData' });
+    dispatch({
+      type: 'list/fetchData',
+      payload: {
+        jumpOrPull: 'pull',
+      },
+    });
+  }
+  onRefreshHandler() {
+    const { dispatch } = this.props;
+    dispatch({ type: 'list/refresh' });
   }
   renderRow(listData) {
     const { tab, author, title, reply_count, visit_count, last_reply_at, id } = listData;
@@ -45,7 +55,7 @@ class ListItem extends React.Component {
     );
   }
   render() {
-    const { listData } = this.props;
+    const { listData, refreshing } = this.props;
     const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
     const dataSource = ds.cloneWithRows(listData);
     const separator = (sectionID, rowID) => (
@@ -67,6 +77,13 @@ class ListItem extends React.Component {
         renderSeparator={separator}
         onEndReached={this.onEndReachedHandler}
         onEndReachedThreshold={20}
+        scrollEventThrottle={200}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={this.onRefreshHandler}
+          />
+        }
       />
     );
   }

@@ -13,15 +13,18 @@ class List extends React.Component {
     };
   }
   render() {
-    const { list } = this.props;
-    const { currentTab, listData } = list;
-    const { dispatch } = this.props;
+    const { list, dispatch } = this.props;
+    const { currentTab, listData, refreshing } = list;
     return (
       <div className={styles.list}>
         <WhiteSpace size="sm" />
         <Nav currentTab={currentTab} />
         <WhiteSpace size="sm" />
-        <ListItem listData={listData} dispatch={dispatch} />
+        <ListItem
+          listData={listData}
+          dispatch={dispatch}
+          refreshing={refreshing}
+        />
       </div>
     );
   }
