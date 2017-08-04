@@ -2,6 +2,7 @@ import React from 'react';
 import { Router } from 'dva/router';
 import PropTypes from 'prop-types';
 import IndexPage from './routes/IndexPage';
+import TopicWrapper from './routes/topic';
 
 const registerModel = (app, model) => {
   if (!(app._models.filter(m => m.namespace === model.namespace).length === 1)) {
@@ -35,6 +36,15 @@ const Routers = function ({ history, app }) {
               registerModel(app, require('./models/loginInfo'));
               cb(null, require('./routes/personalCenter'));
             }, 'personalCenter');
+          },
+        },
+        {
+          path: 'topic/:id',
+          getComponent(nextState, cb) {
+            require.ensure([], (require) => {
+              registerModel(app, require('./models/topic'));
+              cb(null, require('./routes/topic'));
+            }, 'topic');
           },
         },
       ],
