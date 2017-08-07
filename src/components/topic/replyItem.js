@@ -22,6 +22,7 @@ class ReplyItem extends React.Component {
     this.onContentStateChange = this.onContentStateChange.bind(this);
     this.showEditor = this.showEditor.bind(this);
     this.commentThisReply = this.commentThisReply.bind(this);
+    this.upThisReply = this.upThisReply.bind(this);
   }
   onContentStateChange(content) {
     this.setState({
@@ -54,6 +55,16 @@ class ReplyItem extends React.Component {
       showEditor: false,
     });
   }
+  upThisReply() {
+    const { reply, dispatch } = this.props;
+    const reply_id = reply.id;
+    dispatch({
+      type: 'topic/upReplies',
+      payload: {
+        reply_id,
+      },
+    });
+  }
   render() {
     const { reply } = this.props;
     const { author, create_at, ups, is_uped, content } = reply;
@@ -79,7 +90,14 @@ class ReplyItem extends React.Component {
                 <p className={styles.upCount}>点赞数量：{ups.length}</p>
               </div>
               <div className={styles.buttonContainer}>
-                {haveToken ? is_uped ? <Button className={styles.replyOrCommmentButton}>已点赞</Button> : <Button className={styles.replyOrCommmentButton}>给他点赞</Button> : ''}
+                {haveToken ? is_uped ?
+                  <Button
+                    onClick={this.upThisReply}
+                    className={styles.replyOrCommmentButton}
+                  >
+                    已点赞
+                  </Button> :
+                  <Button onClick={this.upThisReply} className={styles.replyOrCommmentButton}>给他点赞</Button> : ''}
                 {haveToken ? <Button onClick={this.showEditor} className={styles.replyOrCommmentButton}>回复评论</Button> : ''}
               </div>
             </div>

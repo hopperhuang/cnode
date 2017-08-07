@@ -47,6 +47,24 @@ const Routers = function ({ history, app }) {
             }, 'topic');
           },
         },
+        {
+          path: 'topics',
+          getComponent(nextState, cb) {
+            require.ensure([], (require) => {
+              registerModel(app, require('./models/topics'));
+              cb(null, require('./routes/topics'));
+            }, 'topics');
+          },
+        },
+        {
+          path: 'update',
+          getComponent(nextState, cb) {
+            require.ensure([], (require) => {
+              registerModel(app, require('./models/topics'));
+              cb(null, require('./routes/updateTopic'));
+            }, 'topics');
+          },
+        },
       ],
     },
   ];

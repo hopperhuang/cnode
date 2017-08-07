@@ -1,7 +1,12 @@
 import { routerRedux } from 'dva/router';
-import { fetchTopic, submitTopicComment } from '../services/topic';
+import {
+  fetchTopic,
+  submitTopicComment,
+  deCollectOneTopic,
+  collectOneTopic,
+  upOneReply,
+ } from '../services/topic';
 
-console.log(submitTopicComment);
 export default {
 
   namespace: 'topic',
@@ -61,10 +66,49 @@ export default {
       const requestResult = yield call(submitTopicComment, params);
       if (requestResult.data) {
         yield put(routerRedux.push(`/topic/${topicId}`));
-        console.log('重新进入这个帖子');
       } else {
         yield put(routerRedux.push(`/topic/${topicId}`));
         throw (new Error('提交评论失败'));
+      }
+    },
+    *deCollectTopic({ payload }, { call, put, select }) {
+      const { topicId } = yield select(state => state.topic);
+      const accesstoken = localStorage.getItem('cnode-accesstoken');
+      const params = { topicId, accesstoken };
+      const requestResult = yield call(deCollectOneTopic, params);
+      if (requestResult.data) {
+        yield put(routerRedux.push(`/topic/${topicId}`));
+      } else {
+        yield put(routerRedux.push(`/topic/${topicId}`));
+        throw (new Error('网络错误，取消收藏失败'));
+      }
+    },
+    *collectTopic({ payload }, { call, put, select }) {
+      const { topicId } = yield select(state => state.topic);
+      const accesstoken = localStorage.getItem('cnode-accesstoken');
+      const params = { topicId, accesstoken };
+      const requestResult = yield call(collectOneTopic, params);
+      if (requestResult.data) {
+        yield put(routerRedux.push(`/topic/${topicId}`));
+      } else {
+        yield put(routerRedux.push(`/topic/${topicId}`));
+        throw (new Error('网络错误，收藏失败'));
+      }
+    },
+    *upReplies({ payload }, { call, put, select }) {
+      const { topicId } = yield select(state => state.topic);
+      const accesstoken = localStorage.getItem('cnode-accesstoken');
+      const { reply_id } = payload;
+      const params = {
+        accesstoken,
+        reply_id,
+      };
+      const requestResult = yield call(upOneReply, params);
+      if (requestResult.data) {
+        yield put(routerRedux.push(`/topic/${topicId}`));
+      } else {
+        yield put(routerRedux.push(`/topic/${topicId}`));
+        throw (new Error('不能为自己点赞，或者网络错误'));
       }
     },
   },

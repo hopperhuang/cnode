@@ -41,6 +41,7 @@ export default {
   effects: {
     *logout({ payload }, { call, put }) {  // eslint-disable-line
       localStorage.removeItem('cnode-accesstoken');
+      localStorage.removeItem('cnode-personalID');
       yield put({ type: 'clearInformation' });
       yield put(routerRedux.push('/'));
     },
@@ -50,6 +51,7 @@ export default {
       if (loginResult.data) {
         const loginInfo = loginResult.data;
         localStorage.setItem('cnode-accesstoken', accesstoken);
+        localStorage.setItem('cnode-personalID', loginInfo.id);
         yield put({ type: 'addInformation', loginInfo });
         yield put(routerRedux.push('/'));
       } else {
@@ -83,7 +85,15 @@ export default {
         // 2.2登录的是权限页面，跳转回IndexPage
         if (pathname === '/personalCenter') {
           yield put(routerRedux.push('/'));
-          throw (new Error('无权进入该页面'));
+          throw (new Error('无权进入该页面，请先登录'));
+        }
+        if (pathname === '/topics') {
+          yield put(routerRedux.push('/'));
+          throw (new Error('无权进入该页面,请先登录'));
+        }
+        if (pathname === '/update') {
+          yield put(routerRedux.push('/'));
+          throw (new Error('无权进入该页面,请先登录'));
         }
       }
     },

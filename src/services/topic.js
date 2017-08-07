@@ -24,3 +24,44 @@ export async function submitTopicComment(params) {
     body,
   });
 }
+export async function deCollectOneTopic(params) {
+  const { accesstoken, topicId } = params;
+  const url = '/api/topic_collect/de_collect';
+  return request(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      accesstoken,
+      topic_id: topicId,
+    }),
+  });
+}
+export async function collectOneTopic(params) {
+  const { accesstoken, topicId } = params;
+  const url = '/api/topic_collect/collect';
+  return request(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      accesstoken,
+      topic_id: topicId,
+    }),
+  });
+}
+export async function upOneReply(params) {
+  const { accesstoken, reply_id } = params;
+  const url = `/api/reply/${reply_id}/ups`;
+  return request(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      accesstoken,
+    }),
+  });
+}

@@ -18,6 +18,9 @@ class Topic extends React.Component {
     };
     this.onContentStateChange = this.onContentStateChange.bind(this);
     this.submitComment = this.submitComment.bind(this);
+    this.collectTopic = this.collectTopic.bind(this);
+    this.deCollectTopic = this.deCollectTopic.bind(this);
+    this.goBack = this.goBack.bind(this);
   }
   componentDidMount() {
     // const { history } = this.props;
@@ -36,6 +39,7 @@ class Topic extends React.Component {
   }
   submitComment() {
     const rawContent = this.state.commentContent;
+    console.log(rawContent);
     const content = draftToMarkdown(rawContent);
     console.log(content);
     const { dispatch } = this.props;
@@ -48,6 +52,22 @@ class Topic extends React.Component {
     this.setState({
       commentContent: '',
     });
+  }
+  collectTopic() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'topic/collectTopic',
+    });
+  }
+  deCollectTopic() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'topic/deCollectTopic',
+    });
+  }
+  goBack() {
+    const { history } = this.props;
+    history.goBack();
   }
   render() {
     const { topic, dispatch } = this.props;
@@ -67,17 +87,22 @@ class Topic extends React.Component {
       content,
       reply_count,
       replies,
+      author_id,
     } = topicData;
     const { loginname } = author;
     const createTime = resolveDate(create_at);
     const replyItems = replies.map(reply => <ReplyItem dispatch={dispatch} reply={reply} key={reply.id} />);
     const haveToken = judgeAccesstoken();
+    const userID = localStorage.getItem('cnode-personalID');
     const { commentContent } = this.state;
     return (
       <div>
         <div className={styles.goBackContainer}>
-          <Button className={styles.goBack}>返回</Button>
-          { haveToken ? is_collect ? <Button className={styles.keep}>取消收藏</Button> : <Button className={styles.keep}>收藏</Button> : ''}
+          <Button onClick={this.goBack} className={styles.goBack}>返回</Button>
+          { haveToken && author_id === userID ? <Link to={`/update?topicId=${topicId}`}><Button className={styles.keep} >编辑文章</Button></Link> : ''}
+          { haveToken ? is_collect ?
+            <Button onClick={this.deCollectTopic} className={styles.keep}>取消收藏</Button> :
+            <Button onClick={this.collectTopic} className={styles.keep}>收藏</Button> : ''}
         </div>
         <WingBlank>
           <h1 className={styles.title}>{title}</h1>
