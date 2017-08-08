@@ -66,6 +66,15 @@ const Routers = function ({ history, app }) {
             }, 'topics');
           },
         },
+        {
+          path: 'message',
+          getComponent(nextState, cb) {
+            require.ensure([], (require) => {
+              registerModel(app, require('./models/message'));
+              cb(null, require('./routes/message'));
+            }, 'message');
+          },
+        },
       ],
     },
   ];

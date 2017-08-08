@@ -1,5 +1,6 @@
 import { routerRedux } from 'dva/router';
-import fetchLogin from '../services/login.js';
+import update from 'immutability-helper';
+import fetchLogin, { fetchUnreadMessageCount } from '../services/login.js';
 
 // 流程判断
 // 1. history.linten --> queryAccesstoken
@@ -50,10 +51,23 @@ export default {
       const loginResult = yield call(fetchLogin, accesstoken);
       if (loginResult.data) {
         const loginInfo = loginResult.data;
-        localStorage.setItem('cnode-accesstoken', accesstoken);
-        localStorage.setItem('cnode-personalID', loginInfo.id);
-        yield put({ type: 'addInformation', loginInfo });
-        yield put(routerRedux.push('/'));
+        const unReadMessageRequest = yield call(fetchUnreadMessageCount, accesstoken);
+        if (unReadMessageRequest.data) {
+          const unReadMessageRequestResult = unReadMessageRequest.data;
+          const unReadCount = unReadMessageRequestResult.data;
+          loginInfo.unReadCount = unReadCount;
+          localStorage.setItem('cnode-accesstoken', accesstoken);
+          localStorage.setItem('cnode-personalID', loginInfo.id);
+          yield put({ type: 'addInformation', loginInfo });
+          yield put(routerRedux.push('/'));
+        } else {
+          yield put(routerRedux.push('/'));
+          throw (new Error('网络错误'));
+        }
+        // localStorage.setItem('cnode-accesstoken', accesstoken);
+        // localStorage.setItem('cnode-personalID', loginInfo.id);
+        // yield put({ type: 'addInformation', loginInfo });
+        // yield put(routerRedux.push('/'));
       } else {
         throw (new Error('未通过验证'));
       }
@@ -78,15 +92,13 @@ export default {
         // 3.3 token存在，本地信息不存在的情况下，fetchLogin拉取信息，更改本地state，前往目标页面。
         const loginResult = yield call(fetchLogin, accesstoken);
         const loginInfo = loginResult.data;
+        const unReadCount = yield call(fetchUnreadMessageCount, accesstoken);
+        loginInfo.unReadCount = unReadCount.data.data;
         yield put({ type: 'addInformation', loginInfo });
       } else {
         const { pathname } = payload;
         // 这里做未登录情况下的权限控制。
         // 2.2登录的是权限页面，跳转回IndexPage
-        if (pathname === '/personalCenter') {
-          yield put(routerRedux.push('/'));
-          throw (new Error('无权进入该页面，请先登录'));
-        }
         if (pathname === '/topics') {
           yield put(routerRedux.push('/'));
           throw (new Error('无权进入该页面,请先登录'));
@@ -95,11 +107,35 @@ export default {
           yield put(routerRedux.push('/'));
           throw (new Error('无权进入该页面,请先登录'));
         }
-        // const userReg = /^\/user\/.+$/;
-        // if (userReg.exec(pathname)) {
-        //   yield put(routerRedux.push('/'));
-        //   throw (new Error('无权进入该页面,请先登录'));
-        // }
+        if (pathname === '/message') {
+          yield put(routerRedux.push('/'));
+          throw (new Error('无权进入该页面,请先登录'));
+        }
+      }
+    },
+    *refreshUnreadCount({ payload }, { call, put }) {
+      console.log('refresh');
+      const { topicID } = payload;
+      const accesstoken = localStorage.getItem('cnode-accesstoken');
+      const requestResult = yield call(fetchUnreadMessageCount, accesstoken);
+      if (requestResult.data) {
+        const { data } = requestResult;
+        const unReadCount = data.data;
+        if (topicID) {
+          yield put({
+            type: 'changeUnreadCount',
+            unReadCount,
+          });
+          yield put(routerRedux.push(`/topic/${topicID}`));
+        } else {
+          yield put({
+            type: 'changeUnreadCount',
+            unReadCount,
+          });
+          yield put(routerRedux.push('/message'));
+        }
+      } else {
+        throw (new Error('网络错误'));
       }
     },
   },
@@ -117,6 +153,16 @@ export default {
       newState.information = loginInfo;
       newState.success = true;
       return { ...newState };
+    },
+    changeUnreadCount(state, action) {
+      const { unReadCount } = action;
+      console.log(unReadCount);
+      const newState = update(state, {
+        information: {
+          unReadCount: { $set: unReadCount },
+        },
+      });
+      return newState;
     },
   },
 

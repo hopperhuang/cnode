@@ -11,3 +11,11 @@ export default async function fetchLogin(accesstoken) {
     }),
   });
 }
+export async function fetchUnreadMessageCount(accesstoken) {
+  const url = `/api/message/count?accesstoken=${accesstoken}`;
+  return request(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
