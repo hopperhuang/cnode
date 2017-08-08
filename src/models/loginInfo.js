@@ -95,6 +95,11 @@ export default {
           yield put(routerRedux.push('/'));
           throw (new Error('无权进入该页面,请先登录'));
         }
+        // const userReg = /^\/user\/.+$/;
+        // if (userReg.exec(pathname)) {
+        //   yield put(routerRedux.push('/'));
+        //   throw (new Error('无权进入该页面,请先登录'));
+        // }
       }
     },
   },

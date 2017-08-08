@@ -30,11 +30,12 @@ const Routers = function ({ history, app }) {
           },
         },
         {
-          path: 'personalCenter',
+          path: 'user/:loginname',
           getComponent(nextState, cb) {
             require.ensure([], (require) => {
-              registerModel(app, require('./models/loginInfo'));
-              cb(null, require('./routes/personalCenter'));
+              // registerModel(app, require('./models/loginInfo'));
+              registerModel(app, require('./models/user'));
+              cb(null, require('./routes/user'));
             }, 'personalCenter');
           },
         },

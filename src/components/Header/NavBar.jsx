@@ -20,7 +20,7 @@ class NavBar extends React.Component {
     const loginAndLogOut = login ?
       <FlexItem><Button onClick={this.logoutHandler}>退出登录</Button></FlexItem> :
       <FlexItem><Link to="/login"><Button>登录</Button></Link></FlexItem>;
-    const personalCenter = login ? <FlexItem><Link to="/personalCenter"><Button>个人中心</Button></Link></FlexItem> : '';
+    const personalCenter = login ? <FlexItem><Link to={`/user/${login.loginname}`}><Button>个人中心</Button></Link></FlexItem> : '';
     const newTopics = login ? <FlexItem><Link to="/topics"><Button>新主题</Button></Link></FlexItem> : '';
     return (
       <Flex
