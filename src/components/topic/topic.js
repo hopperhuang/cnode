@@ -39,9 +39,7 @@ class Topic extends React.Component {
   }
   submitComment() {
     const rawContent = this.state.commentContent;
-    console.log(rawContent);
     const content = draftToMarkdown(rawContent);
-    console.log(content);
     const { dispatch } = this.props;
     dispatch({
       type: 'topic/submitComment',

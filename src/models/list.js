@@ -202,6 +202,7 @@ export default {
       const newState = state;
       newState.currentTab = tab;
       newState.listData = data;
+      newState.currentPage = 1;
       newState.firstLoading = false;
       return { ...newState };
     },
