@@ -10,6 +10,16 @@ class ListItem extends React.Component {
     this.onEndReachedHandler = this.onEndReachedHandler.bind(this);
     this.onRefreshHandler = this.onRefreshHandler.bind(this);
   }
+  componentDidMount() {
+    // 完成加载后将list添加到redux，便于拉去信息后，调用scrollTo方法
+    // 将位置回调到(0,0)
+    const { dispatch } = this.props;
+    const { myList } = this;
+    dispatch({
+      type: 'list/addMyListToRedux',
+      component: myList,
+    });
+  }
   onEndReachedHandler() {
     const { dispatch } = this.props;
     dispatch({
@@ -71,7 +81,9 @@ class ListItem extends React.Component {
     );
     return (
       <ListView
+        ref={(c) => { this.myList = c; }}
         dataSource={dataSource}
+        initialListSize={20}
         renderRow={this.renderRow}
         pageSize={20}
         renderSeparator={separator}

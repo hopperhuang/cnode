@@ -113,9 +113,11 @@ export default {
               tab: currentTab,
             });
             // 重置scrollview的属性，修复listview的Bug
-            const listScrollViewContent = document.querySelector('.am-list-view-scrollview-content');
-            listScrollViewContent.style.transform = 'translate3d(0px, 0px, 0px)';
-            console.log(listScrollViewContent.style.transform);
+            // const listScrollViewContent = document.querySelector('.am-list-view-scrollview-content');
+            // listScrollViewContent.style.transform = 'translate3d(0px, 0px, 0px)';
+            // console.log(listScrollViewContent.style.transform);
+            const { component } = yield select(state => state.list);
+            component.scrollTo(0, 0);
           } else {
             throw (new Error('获取数据失败'));
           }
@@ -222,6 +224,12 @@ export default {
       const newState = state;
       const newRefresing = !newState.refreshing;
       newState.refreshing = newRefresing;
+      return { ...newState };
+    },
+    addMyListToRedux(state, action) {
+      const { component } = action;
+      const newState = state;
+      newState.component = component;
       return { ...newState };
     },
   },
