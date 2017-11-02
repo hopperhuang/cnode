@@ -43,6 +43,7 @@ export default {
     },
   },
 
+  // 这恶是effect的一行注释
   effects: {
     // 开始进入时触发的动作。takeLatest保证数据只拉取一次。
     *judgeFirstLoading({ payload }, { put, select }) {
